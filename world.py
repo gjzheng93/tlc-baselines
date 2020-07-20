@@ -40,8 +40,8 @@ class Intersection(object):
         self.phase_available_startlanes = []
 
         # define yellow phases, currently default to 0
-        self.yellow_phase_id = [0]
-        self.yellow_phase_time = 3
+        self.yellow_phase_id = [-1]
+        self.yellow_phase_time = 0
 
         # parsing links and phases
         for roadlink in intersection["roadLinks"]:
