@@ -3,7 +3,7 @@ from environment import TSCEnv
 from world import World
 from generator import LaneVehicleGenerator
 from agent import SOTLAgent
-from metric import TravelTimeMetric
+from metric import TravelTimeMetric, ThroughputMetric
 import argparse
 
 # parse args
@@ -24,7 +24,7 @@ for i in world.intersections:
     agents.append(SOTLAgent(action_space, i, world))
 
 # create metric
-metric = TravelTimeMetric(world)
+metric = ThroughputMetric(world)
 
 # create env
 env = TSCEnv(world, agents, metric)
@@ -37,6 +37,8 @@ for i in range(args.steps):
     for agent_id, agent in enumerate(agents):
         actions.append(agent.get_action(obs[agent_id]))
     obs, rewards, dones, info = env.step(actions)
+    env.metric.update(done=False)
+
     print(world.intersections[0]._current_phase, end=",")
     print(env.eng.get_average_travel_time())
     #print(obs)
@@ -44,3 +46,9 @@ for i in range(args.steps):
     # print(info["metric"])
 
 #print("Final Travel Time is %.4f" % env.metric.update(done=True))
+
+
+print("Final metric is {:.4f}".format(env.metric.update(done=True)))
+
+
+print("Average travel time is {:.4f}".format(env.eng.get_average_travel_time()))

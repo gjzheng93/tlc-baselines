@@ -3,7 +3,7 @@ import gym
 from environment import TSCEnv
 from world import World
 from agent import Fixedtime_Agent
-from metric import TravelTimeMetric
+from metric import TravelTimeMetric, ThroughputMetric
 import argparse
 
 # parse args
@@ -26,7 +26,7 @@ for i in world.intersections:
     agents.append(Fixedtime_Agent(action_space, args.signal_plan_address, args.signal_plan_prefix, i.id, int(args.single_inter)))
 
 # create metric
-metric = TravelTimeMetric(world)
+metric = ThroughputMetric(world)
 
 # create env
 env = TSCEnv(world, agents, metric)
@@ -39,8 +39,12 @@ for i in range(args.steps):
         for agent in agents:
             actions.append(agent.get_action(world))
         obs, rewards, dones, info = env.step(actions)
+        env.metric.update(done=False)
         print(i, actions)
     except:
         break
 
-print(env.eng.get_average_travel_time())
+print("Final metric is {:.4f}".format(env.metric.update(done=True)))
+
+
+print("Average travel time is {:.4f}".format(env.eng.get_average_travel_time()))

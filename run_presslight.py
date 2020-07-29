@@ -3,7 +3,7 @@ from environment import TSCEnv
 from world import World
 from generator import LaneVehicleGenerator
 from agent.presslight_agent import PressLightAgent
-from metric import TravelTimeMetric
+from metric import TravelTimeMetric, ThroughputMetric
 import argparse
 import os
 import numpy as np
@@ -56,7 +56,7 @@ print(agents[0].ob_length)
 print(agents[0].action_space)
 
 # create metric
-metric = TravelTimeMetric(world)
+metric = ThroughputMetric(world)
 
 # create env
 env = TSCEnv(world, agents, metric)
