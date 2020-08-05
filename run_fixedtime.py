@@ -9,9 +9,6 @@ import argparse
 # parse args
 parser = argparse.ArgumentParser(description='Run Example')
 parser.add_argument('config_file', type=str, help='path of config file')
-parser.add_argument('signal_plan_address', type=str, help='path of signal plan folder')
-parser.add_argument('signal_plan_prefix', type=str, help='prefix of signal plan file')
-parser.add_argument('single_inter', type=str, help='if threre is only one intersection')
 parser.add_argument('--thread', type=int, default=1, help='number of threads')
 parser.add_argument('--steps', type=int, default=3600, help='number of steps')
 args = parser.parse_args()
@@ -23,7 +20,7 @@ world = World(args.config_file, thread_num=args.thread)
 agents = []
 for i in world.intersections:
     action_space = gym.spaces.Discrete(len(i.phases))
-    agents.append(Fixedtime_Agent(action_space, args.signal_plan_address, args.signal_plan_prefix, i.id, int(args.single_inter)))
+    agents.append(Fixedtime_Agent(action_space, i.id))
 
 # create metric
 metric = ThroughputMetric(world)
