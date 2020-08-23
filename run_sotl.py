@@ -3,7 +3,7 @@ from environment import TSCEnv
 from world import World
 from generator import LaneVehicleGenerator
 from agent import SOTLAgent
-from metric import TravelTimeMetric, ThroughputMetric
+from metric import TravelTimeMetric, ThroughputMetric, FuelMetric, TotalCostMetric
 import argparse
 
 # parse args
@@ -29,26 +29,30 @@ metric = ThroughputMetric(world)
 # create env
 env = TSCEnv(world, agents, metric)
 
-# simulate
-obs = env.reset()
-actions = []
-for i in range(args.steps):
+def test(met, met_name):
+
+    # simulate
+    obs = env.reset()
+    env.update_metric(met)
     actions = []
-    for agent_id, agent in enumerate(agents):
-        actions.append(agent.get_action(obs[agent_id]))
-    obs, rewards, dones, info = env.step(actions)
-    env.metric.update(done=False)
+    for i in range(args.steps):
+        actions = []
+        for agent_id, agent in enumerate(agents):
+            actions.append(agent.get_action(obs[agent_id]))
+        obs, rewards, dones, info = env.step(actions)
+        env.metric.update(done=False)
 
-    print(world.intersections[0]._current_phase, end=",")
-    print(env.eng.get_average_travel_time())
-    #print(obs)
-    #print(rewards)
-    # print(info["metric"])
+        print(world.intersections[0]._current_phase, end=",")
 
-#print("Final Travel Time is %.4f" % env.metric.update(done=True))
+    print("{} is {:.4f}".format(met_name, env.metric.update(done=True)))
 
 
-print("Final metric is {:.4f}".format(env.metric.update(done=True)))
 
-
-print("Average travel time is {:.4f}".format(env.eng.get_average_travel_time()))
+metric = TravelTimeMetric(world)
+test(metric, "Average Travel Time")
+metric = ThroughputMetric(world)
+test(metric, "Average throughput")
+metric = FuelMetric(world)
+test(metric, "Average fuel cost")
+metric = TotalCostMetric(world)
+test(metric, "Average total cost")

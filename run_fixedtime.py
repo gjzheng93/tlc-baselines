@@ -3,7 +3,7 @@ import gym
 from environment import TSCEnv
 from world import World
 from agent import Fixedtime_Agent
-from metric import TravelTimeMetric, ThroughputMetric
+from metric import TravelTimeMetric, ThroughputMetric, FuelMetric, TotalCostMetric
 import argparse
 
 # parse args
@@ -29,19 +29,28 @@ metric = ThroughputMetric(world)
 env = TSCEnv(world, agents, metric)
 
 # simulate
-obs = env.reset()
-for i in range(args.steps):
-    actions = []
-    try:
-        for agent in agents:
-            actions.append(agent.get_action(world))
-        obs, rewards, dones, info = env.step(actions)
-        env.metric.update(done=False)
-        print(i, actions)
-    except:
-        break
+def test(met, met_name):
+    obs = env.reset()
+    env.update_metric(met)
+    for i in range(args.steps):
+        actions = []
+        try:
+            for agent in agents:
+                actions.append(agent.get_action(world))
+            obs, rewards, dones, info = env.step(actions)
+            env.metric.update(done=False)
+            print(i, actions)
+        except:
+            break
 
-print("Final metric is {:.4f}".format(env.metric.update(done=True)))
+    print("{} is {:.4f}".format(met_name, env.metric.update(done=True)))
 
+metric = TravelTimeMetric(world)
+test(metric, "Average Travel Time")
+metric = ThroughputMetric(world)
+test(metric, "Average throughput")
+metric = FuelMetric(world)
+test(metric, "Average fuel cost")
+metric = TotalCostMetric(world)
+test(metric, "Average total cost")
 
-print("Average travel time is {:.4f}".format(env.eng.get_average_travel_time()))

@@ -27,6 +27,9 @@ class TSCEnv(gym.Env):
 
         self.metric = metric
 
+    def update_metric(self, metric):
+        self.metric = metric
+
     def step(self, actions):
         assert len(actions) == self.n_agents
 
