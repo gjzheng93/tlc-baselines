@@ -40,19 +40,16 @@ def test(met, met_name):
         for agent_id, agent in enumerate(agents):
             actions.append(agent.get_action(obs[agent_id]))
         obs, rewards, dones, info = env.step(actions)
-        env.metric.update(done=False)
+        for ind_m in range(len(env.metric)):
+            env.metric[ind_m].update(done=False)
 
-        print(world.intersections[0]._current_phase, end=",")
+        if i % 20 == 0:
+            print(i, "/", args.steps, "\n")
 
-    print("{} is {:.4f}".format(met_name, env.metric.update(done=True)))
+    for ind_m in range(len(met_name)):
+        print("{} is {:.4f}".format(met_name[ind_m], env.metric[ind_m].update(done=True)))
 
 
-
-metric = TravelTimeMetric(world)
-test(metric, "Average Travel Time")
-metric = ThroughputMetric(world)
-test(metric, "Average throughput")
-metric = FuelMetric(world)
-test(metric, "Average fuel cost")
-metric = TotalCostMetric(world)
-test(metric, "Average total cost")
+metric = [TravelTimeMetric(world), ThroughputMetric(world), FuelMetric(world), TotalCostMetric(world)]
+metric_name = ["Average Travel Time", "Average throughput", "Average fuel cost", "Average total cost"]
+test(metric, metric_name)

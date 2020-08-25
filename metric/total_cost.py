@@ -8,8 +8,8 @@ class TotalCostMetric(BaseMetric):
     """
     def __init__(self, world):
 
-        self.c_t = 1
-        self.c_f = 1/60/5 * 2.4
+        self.c_t = 1/60/5 * 2.4
+        self.c_f = 1
 
         self.world = world
         self.world.subscribe(["vehicles", "time"])
@@ -59,7 +59,10 @@ class TotalCostMetric(BaseMetric):
 
         for vehicle in vehicles:
             if vehicle not in self.vehicle_route:
-                self.vehicle_route[vehicle] = [dic_vehicle_lane[vehicle]]
+                if vehicle in dic_vehicle_lane:
+                    self.vehicle_route[vehicle] = [dic_vehicle_lane[vehicle]]
+                else:
+                    continue
 
         for vehicle in list(self.vehicle_route):
             if vehicle in dic_vehicle_lane:
@@ -70,7 +73,11 @@ class TotalCostMetric(BaseMetric):
             self.vehicle_fuel[vehicle] = (self.cal_fuel(self.vehicle_route[vehicle]))
 
         for vehicle in self.travel_times.keys():
-            self.vehicle_total_cost[vehicle] = self.c_t * self.travel_times[vehicle] + self.c_f * self.vehicle_fuel[vehicle]
+            if vehicle in self.vehicle_fuel:
+                self.vehicle_total_cost[vehicle] = self.c_t * self.travel_times[vehicle] + self.c_f * self.vehicle_fuel[vehicle]
+
+        if done:
+            print("eveluated vehicles:", len(self.vehicle_total_cost))
 
         return np.mean(list(self.vehicle_total_cost.values())) if len(self.vehicle_total_cost) else 0
 

@@ -24,6 +24,7 @@ class ThroughputMetric(BaseMetric):
             new_exited_vehicles = set(self.last_lane_vehicles[lane_id]) - set(lane)
             self.lane_throughput[lane_id] += list(new_exited_vehicles)
             self.last_lane_vehicles[lane_id] = lane
+
         
         return np.sum([len(lane) for lane_id, lane in self.lane_throughput.items()])
         
